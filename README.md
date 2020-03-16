@@ -1,6 +1,6 @@
 ## Gym - solutions
 This project aims to provide entire set of optimal solutions for GymAI environments.To begin with not all solutions here
-are optimal, rather than just solutions.
+are optimal. This is an on-going project... not all solutions are available, more to come.
 All projects can run on both local and cloud (GCP).
 
 ### Setup (local)
