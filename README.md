@@ -18,3 +18,12 @@ BUCKET_NAME="<bucket-name>"
 export GOOGLE_APPLICATION_CREDENTIALS="credentials-folder"
 REGION="us-central1"
 ```
+
+### Run locally
+TBD
+
+### Run remotely
+
+```
+remote.sh
+```
