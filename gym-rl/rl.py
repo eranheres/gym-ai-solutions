@@ -1,19 +1,14 @@
-import gym
 import numpy as np
-from .renderer import Renderer
 from .callbacks import CALLBACK_STATE
 
 
 def train(env, agent, max_episodes, max_steps, callbacks=[]):
-    losses = []
-    step = 0
-    epsilon = 0
-
     for episode in range(max_episodes):
-        [callback(CALLBACK_STATE.PRE_EPISODE, episode, 0, "train", env) for callback in callbacks]
+        [callback(CALLBACK_STATE.PRE_EPISODE, env, None) for callback in callbacks]
+        losses = []
         observation = env.reset()
         for step in range(max_steps):
-            [callback(CALLBACK_STATE.PRE_STEP, episode, step, "train", env) for callback in callbacks]
+            [callback(CALLBACK_STATE.PRE_STEP, env, None) for callback in callbacks]
             action = agent.action(observation)
             next_observation, reward, done, info = env.step(action)
             loss = agent.learn(
@@ -26,10 +21,11 @@ def train(env, agent, max_episodes, max_steps, callbacks=[]):
             agent.decay_epsilon()
             losses.append(loss)
             observation = next_observation
-            [callback(CALLBACK_STATE.POST_STEP, episode, step, "train", env) for callback in callbacks]
+            [callback(CALLBACK_STATE.POST_STEP, env, None) for callback in callbacks]
             if done:
                 break
-        [callback(CALLBACK_STATE.POST_EPISODE, episode, step, "train", env) for callback in callbacks]
+        loss = np.average(losses)
+        [callback(CALLBACK_STATE.POST_EPISODE, env, loss) for callback in callbacks]
     env.close()
 
 

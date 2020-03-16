@@ -7,7 +7,7 @@ REGION="us-central1"
 echo "starting job:"$JOB_NAME
 gcloud ai-platform jobs submit training $JOB_NAME \
   --package-path gym-rl \
-  --module-name gym-rl.acrobot_v1 \
+  --module-name gym-rl.task \
   --region $REGION \
   --python-version 3.7 \
   --runtime-version 2.1 \

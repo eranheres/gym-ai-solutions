@@ -39,12 +39,12 @@ class Renderer:
         print("uploading file")
         self._uploader.upload(source_folder, filename)
 
-    def callback(self, state, episode, step, mode, env):
+    def callback(self, state, env, attr):
         if state == CALLBACK_STATE.PRE_EPISODE:
             self._reset()
-        if state == CALLBACK_STATE.POST_STEP:
+        elif state == CALLBACK_STATE.POST_STEP:
             self._render(env)
-        if state == CALLBACK_STATE.POST_EPISODE:
+        elif state == CALLBACK_STATE.POST_EPISODE:
             self._close()
             self._episode = self._episode + 1
 

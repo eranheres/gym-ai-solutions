@@ -6,6 +6,7 @@ from . import rl
 from .renderer import Renderer
 from .callbacks import callback_print
 from .uploaders import GCPUploader, LocalUploader
+from .console_printer import ConsolePrinter
 import argparse
 import sys
 import os
@@ -19,8 +20,8 @@ NUM_LAYERS = 2
 UNITS_PER_LAYER = 20
 MAX_MEMORY = 1000
 BATCH_SIZE = 100
-MAX_EPISODES = 1000
-MAX_STEPS = 50
+MAX_EPISODES = 100
+MAX_STEPS = 1000
 FILE_NAME = "cart_pole_v1.h5"
 MODEL_CLS = DenseModel
 CHECKPOINT_EVERY = 10
@@ -41,12 +42,13 @@ def build_agent(env):
 
 
 def train_model(env, agent, renderer):
+    console_printer = ConsolePrinter(MAX_EPISODES)
     # First we train the model
     rl.train(env=env,
              agent=agent,
              max_episodes=MAX_EPISODES,
              max_steps=MAX_STEPS,
-             callbacks=[renderer.callback, callback_print])
+             callbacks=[renderer.callback, console_printer.callback])
 
 
 def run(env, agent, renderer):
@@ -55,7 +57,7 @@ def run(env, agent, renderer):
 
 def parse_command_line():
     parser = argparse.ArgumentParser(description='Run RL for gym CartPole-v1.')
-    parser.add_argument('action', action="store", type=str, help='action to perform [train, run]')
+    parser.add_argument('action', action="store", type=str, choices=['train', 'run'], help='action to perform [train, run]')
     parser.add_argument('--load', dest='load', default=None, help='load from a file')
     parser.add_argument('--job-dir', type=str, default=".", help='local or GCS location for writing checkpoints')
     parser.add_argument('--render', type=str, required=False, default='human', help='render type [human, gif]')
@@ -68,10 +70,12 @@ def virtual_display():
     virtual_display = Display(visible=0, size=(1400, 900))
     virtual_display.start()
 
+
 def write_file(path, filename):
     file = open(os.path.join(path, filename), "w")
     file.write("Hello World")
     file.close()
+
 
 def main():
     args = parse_command_line()
@@ -81,10 +85,6 @@ def main():
     render_mode = Renderer.MODES.DISPLAY if args.render == 'human' else Renderer.MODES.GIF
     load_file = args.load
     job_dir = args.job_dir
-
-    if not do_test and not do_train:
-        print("Mode of operation must be selected, %s is unknown" % {args.action})
-        exit(-1)
 
     env = gym.make(ENV_NAME)
     agent = build_agent(env)
