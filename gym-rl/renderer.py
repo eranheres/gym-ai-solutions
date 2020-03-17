@@ -1,15 +1,10 @@
 from moviepy.editor import ImageSequenceClip
-from enum import Enum
 from .callbacks import CALLBACK_STATE
 
-class Renderer:
-    class MODES(Enum):
-        DISPLAY = 1
-        GIF = 2
 
-    def __init__(self, mode, uploader, render_every=1):
+class Renderer:
+    def __init__(self, uploader, render_every=1):
         self._snapshots = []
-        self._mode = mode
         self._uploader = uploader
         self._render_every = render_every
         self._episode = 0
@@ -23,19 +18,19 @@ class Renderer:
     def _render(self, env):
         if not self._should_render():
             return
-        s = env.render('human' if self._mode == Renderer.MODES.DISPLAY else 'rgb_array')
-        if self._mode == self.MODES.GIF:
+        s = env.render('rgb_array')
+        if self._uploader is not None:
             self._snapshots.append(s)
 
     def _close(self):
-        if self._mode != Renderer.MODES.GIF or len(self._snapshots) == 0:
+        if len(self._snapshots) == 0:
             return
         filename = 'render_' + str(self._episode) + '.gif'
         clip = ImageSequenceClip(self._snapshots, fps=30)
         source_folder = "/tmp/"
         local_filename = source_folder+filename
         print("writing file to:"+local_filename)
-        clip.write_gif(local_filename, fps=30)
+        clip.write_gif(local_filename, fps=30, logger=None)
         print("uploading file")
         self._uploader.upload(source_folder, filename)
 

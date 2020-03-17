@@ -4,7 +4,6 @@ from .models import DenseModel
 from .memories import BasicMemory
 from . import rl
 from .renderer import Renderer
-from .callbacks import callback_print
 from .uploaders import GCPUploader, LocalUploader
 from .console_printer import ConsolePrinter
 import argparse
@@ -21,7 +20,7 @@ UNITS_PER_LAYER = 20
 MAX_MEMORY = 1000
 BATCH_SIZE = 100
 MAX_EPISODES = 100
-MAX_STEPS = 1000
+MAX_STEPS = 10
 FILE_NAME = "cart_pole_v1.h5"
 MODEL_CLS = DenseModel
 CHECKPOINT_EVERY = 10
@@ -57,10 +56,10 @@ def run(env, agent, renderer):
 
 def parse_command_line():
     parser = argparse.ArgumentParser(description='Run RL for gym CartPole-v1.')
-    parser.add_argument('action', action="store", type=str, choices=['train', 'run'], help='action to perform [train, run]')
+    parser.add_argument('action', action="store", type=str, choices=['train', 'run'], help='action to perform')
     parser.add_argument('--load', dest='load', default=None, help='load from a file')
     parser.add_argument('--job-dir', type=str, default=".", help='local or GCS location for writing checkpoints')
-    parser.add_argument('--render', type=str, required=False, default='human', help='render type [human, gif]')
+    parser.add_argument('--save-render', action='store_false', help='save rendering output to a file')
     parser.add_argument('--headless', action='store_true', help='run headless mode')
     return parser.parse_args()
 
@@ -82,14 +81,15 @@ def main():
 
     do_train = args.action == 'train'
     do_test = args.action == 'run'
-    render_mode = Renderer.MODES.DISPLAY if args.render == 'human' else Renderer.MODES.GIF
     load_file = args.load
     job_dir = args.job_dir
 
     env = gym.make(ENV_NAME)
     agent = build_agent(env)
-    uploader = GCPUploader(job_dir) if args.headless else LocalUploader('export')
-    renderer = Renderer(mode=render_mode, uploader=uploader, render_every=CHECKPOINT_EVERY)
+    uploader = None
+    if args.save_render:
+        uploader = GCPUploader(job_dir) if args.headless else LocalUploader('export')
+    renderer = Renderer(uploader=uploader, render_every=CHECKPOINT_EVERY)
 
     if args.headless:
         virtual_display()
