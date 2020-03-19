@@ -15,5 +15,5 @@ gcloud ai-platform jobs submit training $JOB_NAME \
   --stream-logs \
   -- \
   train \
-  --render gif \
+  --save-render \
   --headless
