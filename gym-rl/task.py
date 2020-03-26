@@ -60,14 +60,16 @@ def parse_command_line():
     parser.add_argument('--load', dest='load', default=None, help='load from a file')
     parser.add_argument('--job-dir', type=str, default=".", help='local or GCS location for writing checkpoints')
     parser.add_argument('--save-render', action='store_false', help='save rendering output to a file')
-    parser.add_argument('--headless', action='store_true', help='run headless mode')
+    parser.add_argument('--gcp', action='store_true', help='run on GCP')
+#    parser.add_argument('--dockerized', action='store_true', help='run on dockerized mode')
+
     return parser.parse_args()
 
 
-def virtual_display():
-    from pyvirtualdisplay import Display
-    virtual_display = Display(visible=0, size=(1400, 900))
-    virtual_display.start()
+#def virtual_display():
+#    from pyvirtualdisplay import Display
+#    virtual_display = Display(visible=0, size=(1400, 900))
+#    virtual_display.start()
 
 
 def write_file(path, filename):
@@ -83,16 +85,21 @@ def main():
     do_test = args.action == 'run'
     load_file = args.load
     job_dir = args.job_dir
+    run_on_gcp = args.gcp
+#    dockerized = args.dockerized
 
     env = gym.make(ENV_NAME)
     agent = build_agent(env)
     uploader = None
     if args.save_render:
-        uploader = GCPUploader(job_dir) if args.headless else LocalUploader('export')
+        if run_on_gcp:
+            uploader = GCPUploader(job_dir)
+        else:
+            uploader = LocalUploader('export')
     renderer = Renderer(uploader=uploader, render_every=CHECKPOINT_EVERY)
 
-    if args.headless:
-        virtual_display()
+#    if dockerized:
+#        virtual_display()
 
     if load_file:
         agent.from_file(load_file)

@@ -1,14 +1,22 @@
+ARG CACHEBUST=1
+
 # Specifies base image and tag
 FROM tensorflow/tensorflow:latest-py3
 WORKDIR /root
 
 # Copies the trainer code to the docker image.
 COPY requirements.txt .
-COPY gym-rl ./gym-rl
 
+# python-numpy python-dev cmake zlib1g-dev libjpeg-dev xvfb ffmpeg xorg-dev python-opengl libboost-all-dev libsdl2-dev swig
+RUN apt-get update && apt-get install -y \
+    xvfb ffmpeg xorg-dev python-opengl swig
 # Installs additional packages
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
+ARG CACHEBUST
+COPY gym-rl ./gym-rl
 # Sets up the entry point to invoke the trainer.
-ENTRYPOINT ["python", "test.py"]
+ENTRYPOINT python -m gym-rl.task train --dockerized
+# xvfb-run -s "-screen 0 1400x900x24" python -m gym-rl.task train
+#ENTRYPOINT ["xvfb-run", "-s","-screen 0 1400x900x24","python", "-m", "gym-rl.task", "--save-render", "--headless"]
