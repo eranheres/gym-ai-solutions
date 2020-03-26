@@ -16,7 +16,6 @@ RUN pip install -r requirements.txt
 
 ARG CACHEBUST
 COPY gym-rl ./gym-rl
+
 # Sets up the entry point to invoke the trainer.
-ENTRYPOINT python -m gym-rl.task train --dockerized
-# xvfb-run -s "-screen 0 1400x900x24" python -m gym-rl.task train
-#ENTRYPOINT ["xvfb-run", "-s","-screen 0 1400x900x24","python", "-m", "gym-rl.task", "--save-render", "--headless"]
+ENTRYPOINT python -m gym-rl.task train

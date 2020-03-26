@@ -22,6 +22,13 @@ REGION="us-central1"
 ### Run locally
 TBD
 
+### Run docker locally (mac)
+
+```
+xhost + 10.100.102.15
+docker run --name=gym-ai-solutions -it --rm -e DISPLAY=10.100.102.15:0 --privileged=true -v /tmp/.X11-unix:/tmp/.X11-unix gym-ai-solutions
+```
+
 ### Run remotely
 
 ```
