@@ -20,10 +20,10 @@ UNITS_PER_LAYER = 20
 MAX_MEMORY = 1000
 BATCH_SIZE = 100
 MAX_EPISODES = 100
-MAX_STEPS = 1000
+MAX_STEPS = 10
 FILE_NAME = "cart_pole_v1.h5"
 MODEL_CLS = DenseModel
-CHECKPOINT_EVERY = 10
+CHECKPOINT_EVERY = 1
 
 
 def build_agent(env):
@@ -59,17 +59,17 @@ def parse_command_line():
     parser.add_argument('action', action="store", type=str, choices=['train', 'run'], help='action to perform')
     parser.add_argument('--load', dest='load', default=None, help='load from a file')
     parser.add_argument('--job-dir', type=str, default=".", help='local or GCS location for writing checkpoints')
-    parser.add_argument('--save-render', action='store_false', help='save rendering output to a file')
+    parser.add_argument('--save-render', action='store_true', help='save rendering output to a file')
     parser.add_argument('--gcp', action='store_true', help='run on GCP')
 #    parser.add_argument('--dockerized', action='store_true', help='run on dockerized mode')
 
     return parser.parse_args()
 
 
-#def virtual_display():
-#    from pyvirtualdisplay import Display
-#    virtual_display = Display(visible=0, size=(1400, 900))
-#    virtual_display.start()
+def virtual_display():
+    from pyvirtualdisplay import Display
+    virtual_display = Display(visible=0, size=(1400, 900))
+    virtual_display.start()
 
 
 def write_file(path, filename):
@@ -93,13 +93,16 @@ def main():
     uploader = None
     if args.save_render:
         if run_on_gcp:
+            print("Initalizing GCP Uploader")
             uploader = GCPUploader(job_dir)
         else:
+            print("Initalizing local Uploader")
             uploader = LocalUploader('export')
     renderer = Renderer(uploader=uploader, render_every=CHECKPOINT_EVERY)
 
-#    if dockerized:
-#        virtual_display()
+    if run_on_gcp:
+        print("Initalizing virtual display")
+        virtual_display()
 
     if load_file:
         agent.from_file(load_file)

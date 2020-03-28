@@ -14,8 +14,10 @@ RUN apt-get update && apt-get install -y \
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
+RUN apt-get install x11-utils
+
 ARG CACHEBUST
 COPY gym-rl ./gym-rl
 
 # Sets up the entry point to invoke the trainer.
-ENTRYPOINT python -m gym-rl.task train
+ENTRYPOINT ["python", "-m", "gym-rl.task", "train"]
