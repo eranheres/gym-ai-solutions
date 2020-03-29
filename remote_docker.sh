@@ -17,6 +17,8 @@ gcloud ai-platform jobs submit training $JOB_NAME \
   --master-image-uri $IMAGE_URI \
   --stream-logs \
   -- \
+  gym-rl/envs_configs/MountainCar-v0.json \
+  --save-render \
   --gcp \
   --job-dir=gs://$BUCKET_NAME/$JOB_DIR
 

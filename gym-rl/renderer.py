@@ -3,14 +3,18 @@ from .callbacks import CALLBACK_STATE
 
 
 class Renderer:
-    def __init__(self, uploader, render_every=1):
+    def __init__(self, uploader, render_every=1, save_every=1):
         self._snapshots = []
         self._uploader = uploader
         self._render_every = render_every
+        self._save_every = save_every
         self._episode = 0
 
     def _should_render(self):
         return self._episode % self._render_every == 0
+
+    def _should_save(self):
+        return self._uploader is not None and self._episode % self._save_every == 0
 
     def _reset(self):
         self._snapshots = []
@@ -19,7 +23,7 @@ class Renderer:
         if not self._should_render():
             return
         s = env.render('rgb_array')
-        if self._uploader is not None:
+        if self._should_save():
             self._snapshots.append(s)
 
     def _close(self):

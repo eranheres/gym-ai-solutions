@@ -1,0 +1,15 @@
+{
+    "environment": "Acrobot-v1",
+    "max_episodes": 100,
+    "max_steps": 1000,
+    "checkpoint_every": 10,
+    "render_every": 1,
+    "dqn": {
+        "network": {
+            "layers": 2,
+            "units_per_layer": 20
+        },
+        "memory_size": 1000,
+        "batch_size": 100
+    }
+}
