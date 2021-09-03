@@ -1,7 +1,7 @@
 ARG CACHEBUST=1
 
 # Specifies base image and tag
-FROM tensorflow/tensorflow:latest-py3
+FROM tensorflow/tensorflow:2.2.3-py3
 WORKDIR /root
 
 # Copies the trainer code to the docker image.
